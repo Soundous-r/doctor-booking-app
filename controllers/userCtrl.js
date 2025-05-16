@@ -2,6 +2,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const doctorModel = require('../models/doctorModel');
+const Appointement=require('../models/Appointement')
+const moment = require('moment')
 //register callback
 
 const registerController =async(req,res)=>{
@@ -171,4 +173,69 @@ const getAllDoctorsController = async (req, res) => {
     
   }
 }
-module.exports = {loginController, registerController,authController,applyDoctorController, getAllNotificationController,deleteAllNotificationController,getAllDoctorsController}
+
+const bookAppController=async(req,res)=>{
+
+  try {
+    req.body.date=moment(req.body.date,'DD-MM-YYYY').toISOString();
+    req.body.time=moment(req.body.time,'HH:mm').toISOString();
+    req.body.status="pending";
+    const newAppointement= new Appointement(req.body);
+    await newAppointement.save()
+    const user = await User.findOne({_id:req.body.doctorInfo.userId});
+    user.notification.push({
+      type:"new-appointement-request",
+     message: `A new appointment request from ${req.body.userInfo.name}`,
+
+      onClickPath:'/user/appointements'
+    })
+    await user.save();
+    res.status(200).send({
+      success:true,
+      message:"appointement Booked successfully",
+
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success:false,
+      error,
+      message:"error while booking "
+    })
+  }
+}
+
+
+
+//availability check
+const AvailabilityController= async(req,res)=>{
+
+  try {
+    const date = moment(req.body.date,'DD-MM-YYYY').toISOString();
+       const fromtime = moment(req.body.time,'HH-mm').subtract(1,'hours').toISOString();
+       const totime = moment(req.body.time,'HH-mm').subtract(1,'hours').toISOString();
+       const doctorId=req.body.doctorId;
+       const appointements = await Appointement.find({doctorId,date,time:{
+        $gte:fromtime,$lte:totime
+       }})
+       if(appointements.length >0){
+        return res.status(200).send({
+          message:'Appointement not available ',success:true
+        })
+       }
+       else{
+         return res.status(200).send({
+          message:'Appointement  available ',success:true
+        })
+
+       }
+  } catch (error) {
+    console.log(error);
+        res.status(500).send({
+      success:false,
+      error,
+      message:"error while checking availability "
+    })
+  }
+}
+module.exports = {loginController, registerController,authController,applyDoctorController, getAllNotificationController,deleteAllNotificationController,getAllDoctorsController,bookAppController,AvailabilityController}
