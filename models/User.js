@@ -31,6 +31,10 @@ seenNotification:{
     type: Array,
     default: [],
 },
+  blocked: {
+    type: Boolean,
+    default: false, // By default, the user is not blocked
+  },
 
 })
 

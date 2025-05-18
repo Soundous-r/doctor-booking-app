@@ -2,7 +2,7 @@ import React from 'react'
 import Layout from '../../components/Layout'
 import { useEffect,useState } from 'react'
 import axios from 'axios';
-import { Table } from 'antd';
+import { message, Table } from 'antd';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -23,6 +23,27 @@ const Users = () => {
             
         }}
     //useEffect
+ const handleBlock = async (userId) => {
+    try {
+      const res = await axios.post(
+        '/api/v1/admin/block-user',
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        message.success('User blocked successfully');
+        getUsers(); 
+      }
+    } catch (error) {
+      console.log(error);
+      message.error('Failed to block user');
+    }
+  };
 
     useEffect(() => {
         getUsers();
@@ -51,7 +72,7 @@ const Users = () => {
             dataIndex: 'actions',
             render: (text, record) => (
                 <div className='d-flex'>
-                    <button className='btn btn-danger w-50'>Block</button>
+                    <button className='btn btn-danger w-50'  onClick={() => handleBlock(record._id)}>Block</button>
                    
                 </div>
             ),

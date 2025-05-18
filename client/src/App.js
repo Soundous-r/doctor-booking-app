@@ -14,6 +14,8 @@ import Doctors from './pages/admin/Doctors';
 import Profile from './pages/doctor/Profile';
 import BookingPage from './pages/BookingPage';
 import './App.css'
+import Appointements from './pages/Appointements';
+import AppointementsDoctor from './pages/doctor/AppointementsDoctor';
 
 function App() {
   const {loading} = useSelector((state) => state.alerts);
@@ -73,6 +75,19 @@ function App() {
                </ProtectedRoute>
            
            } />
+            <Route path="/appointments" element=
+          {<ProtectedRoute>
+            
+              <Appointements />
+               </ProtectedRoute>
+           
+           } />
+              <Route path="/doctor-appointments" element={
+  <ProtectedRoute>
+    <AppointementsDoctor />
+  </ProtectedRoute>
+} />
+
           <Route path="/login" element={
             <PublicRoute>
                <Login /> </PublicRoute>

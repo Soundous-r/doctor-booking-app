@@ -28,9 +28,16 @@ const onFinishHandler = async(values) => {
   } catch (error) {
     dispatch(hideLoading());
     console.log(error);
-    message.error('Something went wrong');
-    
-  }
+      if (error.response && error.response.data && error.response.data.message) {
+        if (error.response.data.message === 'Your account has been blocked. Please contact support.') {
+          message.error('Your account has been blocked. Please contact support.');
+        } else {
+          message.error('Something went wrong');
+        }
+      } else {
+        message.error('Something went wrong');
+      }
+    }
   
 };
   return (

@@ -34,6 +34,7 @@ const [doctors, setDoctors] = useState([]);
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         })
+
         if(res.data.success){
           message.success(res.data.message);
           window.location.reload();
@@ -80,11 +81,31 @@ const [doctors, setDoctors] = useState([]);
       dataIndex: "actions",
       render: (text, record) => (
         <div className="d-flex">
-          {record.Status === "pending" ? (
-            <button className="btn btn-success w-50"    onClick={() => handleAccountStatus(record, 'approved')}>Approve</button>
-          ) : (
-            <button className="btn btn-danger w-50">Reject</button>
-          )}
+   {
+  record.Status === "pending" ? (
+    <button 
+      className="btn btn-success w-50" 
+      onClick={() => handleAccountStatus(record, 'approved')}
+    >
+      Approve
+    </button>
+  ) : record.Status === "approved" ? (
+    <button 
+      className="btn btn-danger w-50 " 
+      onClick={() => handleAccountStatus(record, 'rejected')}
+    >
+      Reject
+    </button>
+  ) : record.Status === "rejected" ? (
+    <button 
+      className="btn btn-success w-50 " 
+      onClick={() => handleAccountStatus(record, 'approved')}
+    >
+      Approve
+    </button>
+  ) : null
+}
+
         </div>
       ),
     },

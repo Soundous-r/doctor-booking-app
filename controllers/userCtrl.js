@@ -35,6 +35,12 @@ const loginController =async (req,res)=>{
         if(!user){
             return res.status(200).send({success:false,message:'User not found'});
         }
+          if (user.blocked) {
+      return res.status(403).send({
+        success: false,
+        message: 'Your account has been blocked. Please contact support.',
+      });
+    }
         const isMatch = await bcrypt.compare(req.body.password, user.password);
         
         if(!isMatch){
@@ -63,6 +69,7 @@ const  authController = async (req, res) => {
           data:user
         });
       }
+    
     } catch (error) {
       console.log(error);
       res.status(500).send({
@@ -238,4 +245,23 @@ const AvailabilityController= async(req,res)=>{
     })
   }
 }
-module.exports = {loginController, registerController,authController,applyDoctorController, getAllNotificationController,deleteAllNotificationController,getAllDoctorsController,bookAppController,AvailabilityController}
+
+//listing appoitements
+const userAppointementController= async(req,res)=>{
+  try {
+    const appointements= await Appointement.find({userId:req.body.userId});
+    res.status(200).send({
+      success:true,
+      message:"User appointements fetched successfully",
+      data:appointements,
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success:false,
+      message:"error in displaying user appointements",
+      error
+    })
+  }
+}
+module.exports = {loginController, registerController,authController,applyDoctorController, getAllNotificationController,deleteAllNotificationController,getAllDoctorsController,bookAppController,AvailabilityController,userAppointementController}
