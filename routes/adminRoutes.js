@@ -13,7 +13,7 @@ router.get('/getAllDoctors',authMiddleware,getAllDoctorsController);
 router.post('/changeAccountStatus',authMiddleware,changeAccountStatusController);
 
 //block a user
-router.post('/block-user',authMiddleware,BlockUserController)
+router.post('/block-user/:userId', authMiddleware, BlockUserController);
 
 
 module.exports = router;

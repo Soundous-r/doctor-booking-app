@@ -68,35 +68,34 @@ const changeAccountStatusController=async(req,res)=>{
         
     }
 }
-const BlockUserController = async(req,res)=>{
-     try {
-    const { userId } = req.body;  
-    
-    
-    const user = await User.findByIdAndUpdate(userId, { blocked: true }, { new: true });
-    
+const BlockUserController = async (req, res) => {
+  try {
+    const targetUserId = req.params.userId;  // Get the userId from the URL parameter
+
+    // Proceed with blocking the user
+    const user = await User.findByIdAndUpdate(targetUserId, { blocked: true }, { new: true });
+
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
     res.status(200).send({
       success: true,
-      message: 'User blocked successfully',
+      message: "User blocked successfully",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'Error blocking user',
+      message: "Error blocking user",
       error,
     });
   }
 };
-
 
 
 module.exports={

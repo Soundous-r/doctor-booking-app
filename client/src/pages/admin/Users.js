@@ -3,6 +3,7 @@ import Layout from '../../components/Layout'
 import { useEffect,useState } from 'react'
 import axios from 'axios';
 import { message, Table } from 'antd';
+import { jwtDecode } from 'jwt-decode';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -23,27 +24,50 @@ const Users = () => {
             
         }}
     //useEffect
- const handleBlock = async (userId) => {
-    try {
-      const res = await axios.post(
-        '/api/v1/admin/block-user',
-        { userId },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
 
-      if (res.data.success) {
-        message.success('User blocked successfully');
-        getUsers(); 
-      }
-    } catch (error) {
-      console.log(error);
-      message.error('Failed to block user');
+
+const handleBlock = async (targetUserId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error("No token found.");
+      return;
     }
-  };
+
+    const res = await axios.post(
+      `/api/v1/admin/block-user/${targetUserId}`, 
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      }
+    );
+
+    console.log("API Response:", res.data);
+
+    if (res.data.success) {
+      message.success("User blocked successfully");
+    } else {
+      message.error(res.data.message);
+    }
+  } catch (error) {
+    console.error("Block Error:", error);
+
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.message
+    ) {
+      message.error(error.response.data.message);
+    } else {
+      message.error("Something went wrong");
+    }
+  }
+};
+
+
+
 
     useEffect(() => {
         getUsers();
